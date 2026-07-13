@@ -185,6 +185,7 @@ button:focus-visible, a:focus-visible, textarea:focus-visible {
 .mode-disclosure { margin: 0 0 16px; padding: 12px 14px; border-left: 3px solid var(--moss); background: #e9e7dc; }
 .mode-disclosure strong { display: block; margin-bottom: 4px; font-size: 12px; }
 .mode-disclosure p { margin: 0; color: var(--ink-soft); font-size: 11px; line-height: 1.45; }
+.action-feedback { margin: 0 0 12px; min-height: 18px; color: var(--moss); font-size: 11px; font-weight: 700; line-height: 1.45; }
 .api-error { margin: 0 0 16px; padding: 12px 14px; border: 1px solid var(--risk); color: var(--risk); }
 .api-error strong { display: block; font-size: 12px; }
 .api-error p { margin: 4px 0; color: var(--ink); font-size: 11px; }
