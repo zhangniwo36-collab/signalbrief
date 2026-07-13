@@ -20,6 +20,8 @@ test("server-renders the SignalBrief portfolio product", async () => {
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
+  assert.match(html, /<html[^>]*lang="en"[^>]*translate="no"/i);
+  assert.match(html, /<meta[^>]*name="google"[^>]*content="notranslate"/i);
   assert.match(html, /<title>SignalBrief — Turn documents into clear next moves<\/title>/i);
   assert.match(html, /Turn messy documents into clear next moves/);
   assert.match(html, /Working document/);
