@@ -30,6 +30,8 @@ test("server-renders the SignalBrief portfolio product", async () => {
   assert.match(html, /Risks &amp; dependencies/);
   assert.match(html, /Analyze with AI/);
   assert.match(html, /Run local demo/);
+  assert.match(html, /Sample and local brief are already loaded/);
+  assert.match(html, /role="status"[^>]*aria-live="polite"/i);
   assert.match(html, /Engineering evidence/);
   assert.match(html, /github\.com\/zhangniwo36-collab\/signalbrief/);
   assert.match(html, /og\.png/);
