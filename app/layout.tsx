@@ -13,6 +13,9 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: baseUrl,
     title: "SignalBrief — Turn documents into clear next moves",
     description: "A working AI document intelligence case study with a real OpenAI path, explicit local mode, and verifiable engineering controls.",
+    other: {
+      google: "notranslate",
+    },
     openGraph: {
       title: "SignalBrief",
       description: "A reliable path from messy source documents to structured decisions.",
@@ -29,5 +32,5 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body>{children}</body></html>;
+  return <html lang="en" translate="no" className="notranslate"><body>{children}</body></html>;
 }
