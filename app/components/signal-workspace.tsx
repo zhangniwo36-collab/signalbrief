@@ -21,6 +21,10 @@ export function SignalWorkspace() {
   const [meta, setMeta] = useState<AnalysisMeta>({ mode: "local" });
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<AnalyzeError["error"] | null>(null);
+  const [actionFeedback, setActionFeedback] = useState({
+    id: 0,
+    message: "Sample and local brief are already loaded.",
+  });
 
   const resultStatus = isLoading
     ? "Analyzing"
@@ -30,7 +34,7 @@ export function SignalWorkspace() {
 
   function loadSample() {
     setDocumentText(sampleDocument);
-    runLocalAnalysis(sampleDocument);
+    runLocalAnalysis(sampleDocument, "Sample reloaded and local brief refreshed.");
   }
 
   function clearWorkspace() {
@@ -38,12 +42,18 @@ export function SignalWorkspace() {
     setAnalysis(emptyResult);
     setMeta({ mode: "local" });
     setApiError(null);
+    announceAction("Workspace cleared. Load the sample or paste a document to continue.");
   }
 
-  function runLocalAnalysis(text = documentText) {
+  function announceAction(message: string) {
+    setActionFeedback((current) => ({ id: current.id + 1, message }));
+  }
+
+  function runLocalAnalysis(text = documentText, message = "Local brief refreshed. Review the results on the right.") {
     setAnalysis(analyzeDocument(text));
     setMeta({ mode: "local" });
     setApiError(null);
+    announceAction(message);
   }
 
   async function runAiAnalysis() {
@@ -132,6 +142,10 @@ export function SignalWorkspace() {
             <small>Request ID: {apiError.requestId}</small>
           </div>
         )}
+
+        <p className="action-feedback" role="status" aria-live="polite" aria-atomic="true">
+          <span key={actionFeedback.id}>{actionFeedback.message}</span>
+        </p>
 
         <div className="workspace-actions">
           <div>
