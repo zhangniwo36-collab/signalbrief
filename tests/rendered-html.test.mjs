@@ -26,11 +26,10 @@ test("server-renders the SignalBrief portfolio product", async () => {
   assert.match(html, /Turn messy documents into clear next moves/);
   assert.match(html, /Working document/);
   assert.match(html, /Structured intelligence/);
-  assert.match(html, /What matters now/);
-  assert.match(html, /Risks &amp; dependencies/);
+  assert.match(html, /Your decision brief will appear here/);
   assert.match(html, /Analyze with AI/);
   assert.match(html, /Run local demo/);
-  assert.match(html, /Sample and local brief are already loaded/);
+  assert.match(html, /Load the sample or paste a document, then run the local demo/);
   assert.match(html, /role="status"[^>]*aria-live="polite"/i);
   assert.match(html, /Engineering evidence/);
   assert.match(html, /github\.com\/zhangniwo36-collab\/signalbrief/);
@@ -51,4 +50,13 @@ test("removes disposable starter assets and metadata", async () => {
   assert.match(layout, /Turn documents into clear next moves/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
   await assert.rejects(access(new URL("../app/_sites-preview/", import.meta.url)));
+});
+
+test("keeps loading the sample separate from running local analysis", async () => {
+  const workspace = await readFile(new URL("../app/components/signal-workspace.tsx", import.meta.url), "utf8");
+  const loadSample = workspace.match(/function loadSample\(\) \{([\s\S]*?)\n  \}/)?.[1] ?? "";
+
+  assert.match(loadSample, /setDocumentText\(sampleDocument\)/);
+  assert.match(loadSample, /setAnalysis\(emptyResult\)/);
+  assert.doesNotMatch(loadSample, /runLocalAnalysis/);
 });
