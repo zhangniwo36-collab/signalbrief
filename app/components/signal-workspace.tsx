@@ -16,14 +16,14 @@ There is a risk that the vendor security review may delay access to production d
 const emptyResult = analyzeDocument("");
 
 export function SignalWorkspace() {
-  const [documentText, setDocumentText] = useState(sampleDocument);
-  const [analysis, setAnalysis] = useState<AnalysisResult>(() => analyzeDocument(sampleDocument));
+  const [documentText, setDocumentText] = useState("");
+  const [analysis, setAnalysis] = useState<AnalysisResult>(emptyResult);
   const [meta, setMeta] = useState<AnalysisMeta>({ mode: "local" });
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<AnalyzeError["error"] | null>(null);
   const [actionFeedback, setActionFeedback] = useState({
     id: 0,
-    message: "Sample and local brief are already loaded.",
+    message: "Load the sample or paste a document, then run the local demo.",
   });
 
   const resultStatus = isLoading
@@ -34,7 +34,10 @@ export function SignalWorkspace() {
 
   function loadSample() {
     setDocumentText(sampleDocument);
-    runLocalAnalysis(sampleDocument, "Sample reloaded and local brief refreshed.");
+    setAnalysis(emptyResult);
+    setMeta({ mode: "local" });
+    setApiError(null);
+    announceAction("Sample loaded. Run local demo to generate the brief.");
   }
 
   function clearWorkspace() {
@@ -49,11 +52,21 @@ export function SignalWorkspace() {
     setActionFeedback((current) => ({ id: current.id + 1, message }));
   }
 
-  function runLocalAnalysis(text = documentText, message = "Local brief refreshed. Review the results on the right.") {
+  function updateDocument(text: string) {
+    setDocumentText(text);
+    if (analysis.status !== "empty" || apiError) {
+      setAnalysis(emptyResult);
+      setMeta({ mode: "local" });
+      setApiError(null);
+      announceAction("Document changed. Run local demo to generate a fresh brief.");
+    }
+  }
+
+  function runLocalAnalysis(text = documentText) {
     setAnalysis(analyzeDocument(text));
     setMeta({ mode: "local" });
     setApiError(null);
-    announceAction(message);
+    announceAction("Local brief generated. Review the results on the right.");
   }
 
   async function runAiAnalysis() {
@@ -115,7 +128,7 @@ export function SignalWorkspace() {
           id="source-document"
           value={documentText}
           maxLength={MAX_DOCUMENT_CHARACTERS}
-          onChange={(event) => setDocumentText(event.target.value)}
+          onChange={(event) => updateDocument(event.target.value)}
           placeholder="Paste meeting notes, a project brief, or an operating update…"
           spellCheck="true"
           disabled={isLoading}
@@ -127,11 +140,13 @@ export function SignalWorkspace() {
         </div>
 
         <div className="mode-disclosure">
-          <strong>{meta.mode === "ai" ? `AI mode · ${meta.model ?? "OpenAI"}` : "Local demo mode"}</strong>
+          <strong>{meta.mode === "ai" ? `AI mode · ${meta.model ?? "OpenAI"}` : analysis.status === "ready" ? "Local demo mode" : "Ready for analysis"}</strong>
           <p>
             {meta.mode === "ai"
               ? "This result was generated server-side with OpenAI. The document was sent to the API for this request and was not stored by SignalBrief."
-              : "The current result uses deterministic browser rules. Nothing leaves this browser, and it is not presented as AI."}
+              : analysis.status === "ready"
+                ? "The current result uses deterministic browser rules. Nothing leaves this browser, and it is not presented as AI."
+                : "Load or paste a document, then choose local or AI analysis. No analysis runs automatically."}
           </p>
         </div>
 
